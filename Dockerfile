@@ -2,12 +2,12 @@ FROM denoland/deno
 
 WORKDIR /app
 
-USER deno
+ADD . /app
 
-COPY . .
-
-RUN deno install
+RUN deno install --entrypoint src/main.ts
 
 ENV PORT=8000
+EXPOSE 8000
 
 CMD ["run", "-A", "src/main.ts"]
+

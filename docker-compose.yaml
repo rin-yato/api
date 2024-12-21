@@ -7,13 +7,16 @@ services:
       - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.routers.api.tls.certresolver=myresolver"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.docker.network=proxy"
     env_file:
       - .env
     deploy:
       mode: replicated
       replicas: 2
     restart: unless-stopped
+    networks:
+      - proxy
 
 networks:
-  traefik:
+  proxy:
     external: true
