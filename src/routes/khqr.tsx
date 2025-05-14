@@ -105,8 +105,8 @@ const khqrSchema = z.object({
     .transform((v) => (v === "116" ? "KHR" : "USD")),
 });
 
-KHQRRoute.get("/khqr/:qr", async (c) => {
-  const { qr } = c.req.param();
+KHQRRoute.get("/khqr", async (c) => {
+  const { qr } = await c.req.query();
 
   const { data } = TSKHQR.parse(qr);
 
