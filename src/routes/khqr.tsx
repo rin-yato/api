@@ -129,10 +129,10 @@ KHQRRoute.get("/khqr/:qr", async (c) => {
   return satoriResponse(<KHQR {...khqrData.data} qrDataURL={qrDataURL} />);
 });
 
-KHQRRoute.post("/abakhqr", async (c) => {
-  const body = await c.req.json();
+KHQRRoute.get("/abakhqr", async (c) => {
+  const { qrString } = await c.req.query();
 
-  const { data } = TSKHQR.parse(body?.qrString);
+  const { data } = TSKHQR.parse(qrString);
 
   if (!data) {
     return c.text("Invalid KHQR code", { status: 403 });
@@ -142,13 +142,13 @@ KHQRRoute.post("/abakhqr", async (c) => {
     name: data.merchantName,
     amount: data.transactionAmount,
     currency: data.transactionCurrency,
-    qr: body?.qrString,
+    qr: qrString,
   });
   if (!khqrData.success) {
     return c.text("Invalid KHQR code", { status: 403 });
   }
 
-  const qrDataURL = await qrcode.toDataURL(body?.qrString, {
+  const qrDataURL = await qrcode.toDataURL(qrString, {
     scale: 40,
     margin: 4,
   });
