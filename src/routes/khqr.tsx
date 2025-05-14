@@ -128,3 +128,30 @@ KHQRRoute.get("/khqr/:qr", async (c) => {
 
   return satoriResponse(<KHQR {...khqrData.data} qrDataURL={qrDataURL} />);
 });
+
+KHQRRoute.post("/abakhqr", async (c) => {
+  const body = await c.req.json();
+
+  const { data } = TSKHQR.parse(body?.qrString);
+
+  if (!data) {
+    return c.text("Invalid KHQR code", { status: 403 });
+  }
+
+  const khqrData = khqrSchema.safeParse({
+    name: data.merchantName,
+    amount: data.transactionAmount,
+    currency: data.transactionCurrency,
+    qr: body?.qrString,
+  });
+  if (!khqrData.success) {
+    return c.text("Invalid KHQR code", { status: 403 });
+  }
+
+  const qrDataURL = await qrcode.toDataURL(body?.qrString, {
+    scale: 40,
+    margin: 4,
+  });
+
+  return satoriResponse(<KHQR {...khqrData.data} qrDataURL={qrDataURL} />);
+});
