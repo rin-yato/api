@@ -105,8 +105,8 @@ const khqrSchema = z.object({
     .transform((v) => (v === "116" ? "KHR" : "USD")),
 });
 
-KHQRRoute.get("/khqr/:qr", async (c) => {
-  const { qr } = c.req.param();
+KHQRRoute.get("/khqr", async (c) => {
+  const { qr } = await c.req.query();
 
   const { data } = TSKHQR.parse(qr);
 
@@ -125,33 +125,6 @@ KHQRRoute.get("/khqr/:qr", async (c) => {
   }
 
   const qrDataURL = await qrcode.toDataURL(qr, { scale: 40, margin: 4 });
-
-  return satoriResponse(<KHQR {...khqrData.data} qrDataURL={qrDataURL} />);
-});
-
-KHQRRoute.get("/abakhqr", async (c) => {
-  const { qrString } = await c.req.query();
-
-  const { data } = TSKHQR.parse(qrString);
-
-  if (!data) {
-    return c.text("Invalid KHQR code", { status: 403 });
-  }
-
-  const khqrData = khqrSchema.safeParse({
-    name: data.merchantName,
-    amount: data.transactionAmount,
-    currency: data.transactionCurrency,
-    qr: qrString,
-  });
-  if (!khqrData.success) {
-    return c.text("Invalid KHQR code", { status: 403 });
-  }
-
-  const qrDataURL = await qrcode.toDataURL(qrString, {
-    scale: 40,
-    margin: 4,
-  });
 
   return satoriResponse(<KHQR {...khqrData.data} qrDataURL={qrDataURL} />);
 });
